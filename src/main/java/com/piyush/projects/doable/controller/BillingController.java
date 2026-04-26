@@ -1,6 +1,7 @@
 package com.piyush.projects.doable.controller;
 
 import com.piyush.projects.doable.dto.subscription.*;
+import com.piyush.projects.doable.service.PaymentProcessor;
 import com.piyush.projects.doable.service.PlanService;
 import com.piyush.projects.doable.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class BillingController {
     private final PlanService planService;
     private final SubscriptionService subscriptionService;
+    private final PaymentProcessor paymentProcessor;
 
     @GetMapping("/api/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans(){
@@ -29,17 +31,16 @@ public class BillingController {
         return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
     }
 
-    @PostMapping("/api/stripe/checkout")
+    @PostMapping("/api/payments/checkout")
     public ResponseEntity<CheckoutResponse> checkoutStripe(
             @RequestBody CheckoutRequest request
     ){
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.createCheckoutSessionUrl(request,userId));
+        return ResponseEntity.ok(paymentProcessor.createCheckoutSessionUrl(request));
     }
 
-    @PostMapping("/api/stripe/portal")
+    @PostMapping("/api/payments/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal(){
         Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.openCustomerPortal(userId));
+        return ResponseEntity.ok(paymentProcessor.openCustomerPortal(userId));
     }
 }
